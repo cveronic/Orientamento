@@ -1,9 +1,13 @@
 IL TUO TALENTO — laboratorio di circa 20 minuti
 
-Apri: https://cveronic.github.io/Orientamento/
+App pubblica: https://il-tuo-talento-laboratorio-20.haledell64.chatgpt.site
 
-Offline: estrai questo archivio e apri index.html.
-Video definitivo: 1 minuto e 28 secondi. Nessuna registrazione.
-Prima di chiudere o ricaricare la pagina, scarica la tua cartolina.
+Materiali originali: Équipe Formative Territoriali. Tutti i diritti riservati.
+Gestione autorizzata: Veronica Cavicchi.
+Utilizzo dell’app consentito a tutti secondo LICENSE.md.
+Clonazione, redistribuzione e riutilizzo dei sorgenti o dei materiali originali richiedono autorizzazione.
+Il pacchetto sorgente è riservato alla gestione autorizzata: non redistribuirlo.
 
-Collegamento alternativo: https://il-tuo-talento-laboratorio-20.haledell64.chatgpt.site
+Per l’esecuzione locale autorizzata: aprire index.html mantenendo assets nella stessa cartella.
+Video definitivo: 1 minuto e 28 secondi.
+Prima di chiudere o ricaricare la pagina, salvare la cartolina personale.
