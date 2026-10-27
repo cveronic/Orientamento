@@ -1,0 +1,53 @@
+name: Importa il laboratorio completo
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/importa-laboratorio.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: importa-laboratorio
+  cancel-in-progress: false
+jobs:
+  importa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Importa e verifica i materiali definitivi
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f index.html ]; then
+            echo "Il laboratorio è già presente. Nessun file viene sovrascritto."
+            exit 0
+          fi
+          curl --fail --location --retry 3 'https://il-tuo-talento-laboratorio-20.haledell64.chatgpt.site/pacchetto-laboratorio.zip' -o /tmp/laboratorio.zip
+          echo 'ca715fa6f407bc3ef693dc2c93be443f6c01adf3b9ffa4523f72419de878bebb  /tmp/laboratorio.zip' | sha256sum --check
+          python3 - <<'PY'
+          from pathlib import Path
+          import zipfile, re, subprocess, hashlib
+          with zipfile.ZipFile('/tmp/laboratorio.zip') as archive:
+              assert archive.testzip() is None
+              for name in archive.namelist():
+                  p = Path(name)
+                  assert not p.is_absolute() and '..' not in p.parts and '.git' not in p.parts
+              archive.extractall('.')
+          assert Path('assets/laboratorio-definitivo.mp4').is_file()
+          page = Path('index.html').read_text()
+          assert 'assets/laboratorio-definitivo.mp4' in page
+          Path('/tmp/app-check.js').write_text('\n'.join(re.findall(r'<script[^>]*>(.*?)</script>', page, re.S)))
+          subprocess.run(['node', '--check', '/tmp/app-check.js'], check=True)
+          Path('.nojekyll').touch()
+          Path('LEGGIMI.txt').write_text('IL TUO TALENTO — laboratorio di circa 20 minuti\n\nApri: https://cveronic.github.io/Orientamento/\n\nOffline: estrai questo archivio e apri index.html.\nVideo definitivo: 1 minuto e 28 secondi. Nessuna registrazione.\nPrima di chiudere o ricaricare la pagina, scarica la tua cartolina.\n\nCollegamento alternativo: https://il-tuo-talento-laboratorio-20.haledell64.chatgpt.site\n')
+          with zipfile.ZipFile('pacchetto-laboratorio.zip', 'w', zipfile.ZIP_DEFLATED) as output:
+              for p in sorted(Path('.').rglob('*')):
+                  if p.is_file() and (p.parts[0]=='assets' or str(p) in ['index.html','guida-laboratorio.pdf','qr-laboratorio.png','LEGGIMI.txt','.nojekyll']):
+                      output.write(p, str(p))
+          print('Video e materiali importati; JavaScript e archivio verificati.')
+          PY
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add index.html assets guida-laboratorio.pdf qr-laboratorio.png LEGGIMI.txt .nojekyll pacchetto-laboratorio.zip
+          git commit -m "Pubblica laboratorio completo con video definitivo"
+          git push origin HEAD:main
